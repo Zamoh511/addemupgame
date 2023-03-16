@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
-using DocumentFormat.OpenXml.Vml;
-using iTextSharp.text.pdf.parser;
+using System.Linq;
 
 namespace addemupgame
 {
@@ -14,7 +12,7 @@ namespace addemupgame
             // Define a List to hold the player information
             List<Player> players = new List<Player>();
 
-          string line;
+            string line;
             string outputFilePath = "C:\\Output\\xyz.txt";
             string inputFilePath = "C:\\Output\\abc.txt";
             using (StreamReader reader = new StreamReader(inputFilePath))
@@ -30,12 +28,12 @@ namespace addemupgame
 
                     // Extract the card values from the input line
                     List<Card> cards = new List<Card>();
-                    for (int i = 1; i < values.Length; i++)
+                    for (int i = 0; i < values.Length; i++)
                     {
                         string[] cardValues = values[i].Split(',');
                         //int value =Convert.ToInt32 (cardValues[0].Remove(cardValues[0].Length-1));
-                        int value = isInt(Convert.ToString(cardValues[0]));
-                        string suit = cardValues[0].Substring(1,1);
+                        int value = cardValue(cardValues[0].Substring(0, (cardValues[0].Length - 1)));
+                        string suit = cardValues[0].Substring(cardValues[0].Length-1);
                         Card card = new Card(value, suit);
                         cards.Add(card);
                     }
@@ -43,7 +41,9 @@ namespace addemupgame
                     // Create a new player object and add it to the list
                     var player = new Player(cards);
                     player.PlayerName = playerName;
+                    
                     players.Add(player);
+
                 }
             }
 
@@ -93,38 +93,49 @@ namespace addemupgame
             // Write the winner(s) to the output file
             if (winners.Count == 1)
             {
+                Console.WriteLine($"{winners[0].PlayerName}:{winners[0].TotalScore}");
                 writer.WriteLine($"{winners[0].PlayerName}:{winners[0].TotalScore}");
                 //writer.WriteLine($":{winners[0].TotalScore}");
             }
             else
             {
-                string winnerNames = string.Join(", ", winners.Select(p => p));
-                writer.WriteLine($"Tie between: {winnerNames}");
+                string winnerNames = string.Join(", ", winners.Select(p => p.PlayerName));
+                writer.WriteLine($"Tie between: {winnerNames.ToString()}");
             }
-
-
-
         }
-        public static int isInt(string  val)
+        public static int cardValue(string val)
         {
-            val = val.Substring(0,1);
+           // val = val.Substring(0, 1);
             int value = 0;
-            switch (val.ToUpper().Trim())
+
+            Dictionary<string, int> cards = new Dictionary<string, int>();
+            cards.Add("A", 11);
+            cards.Add("J", 11);
+            cards.Add("Q", 12);
+            cards.Add("K", 13);
+
+            if (cards.ContainsKey(val))
             {
-                case "A":
-                    value = 11;
-                    break;
-                case "J":
-                    value = 11;
-                    break;
-                case "Q":
-                    value = 12;
-                    break;
-                case "K":
-                    value = 13;
-                    break;
+                switch (val.ToUpper().Trim())
+                {
+                    case "A":
+                        value = 11;
+                        break;
+                    case "J":
+                        value = 11;
+                        break;
+                    case "Q":
+                        value = 12;
+                        break;
+                    case "K":
+                        value = 13;
+                        break;
+                }
             }
-            value = Convert.ToInt32(value);
+            else
+            {
+                value = Convert.ToInt32(val);
+            }
             return value;
         }
         public class Card
@@ -140,9 +151,9 @@ namespace addemupgame
                 Suit = suit;
 
                 // Set the score of the card based on its suit
-                
 
-                 switch (suit)
+
+                switch (suit)
                 {
                     case "diamonds":
                         Score = 1;
