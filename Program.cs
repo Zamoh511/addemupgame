@@ -109,7 +109,7 @@ namespace addemupgame
         {
             val = val.Substring(0,1);
             int value = 0;
-            switch (val)
+            switch (val.ToUpper().Trim())
             {
                 case "A":
                     value = 11;
@@ -142,7 +142,7 @@ namespace addemupgame
                 // Set the score of the card based on its suit
                 
 
-                switch (suit)
+                 switch (suit)
                 {
                     case "diamonds":
                         Score = 1;
